@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <title>Trabajo Práctico 1</title>
+</head>
+<body>
+    <div class="app" id="app">
+        <div class="seccion">
+             <h4 class="text-primary">Información de Perfil Simple (Interpolación)</h4>
+        <p class="text-body">Hola, mi nombre es {{ nombre }}, tengo {{ edad }} años y vivo en {{ ciudad }}.</p>
+            </div>
+       
+        
+        </div>
+
+        <script>
+            const { createApp } = Vue;
+
+            createApp({
+                data() {
+                    return {
+                        nombre: 'Ana García',
+                        edad: 30,
+                        ciudad: 'Tupungato'
+                    }
+                }
+            }).mount('#app');
+        </script>
+        <style>
+            .app{
+                margin: 2rem;
+                text-align: center;
+            }
+            .seccion{
+                border-bottom: 1px solid #999; 
+                padding: 2rem;
+            }
+            </style>
+</body>
+</html>
