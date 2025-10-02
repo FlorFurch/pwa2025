@@ -19,8 +19,7 @@
           Información de Perfil Simple (Interpolación)
         </h4>
         <p class="text-body">
-          Hola, mi nombre es {{ nombre }}, tengo {{ edad }} años y vivo en {{
-          ciudad }}.
+          Hola, mi nombre es {{ nombre }}, tengo {{ edad }} años y vivo en {{ ciudad }}.
         </p>
       </div>
       <div class="seccion">
@@ -33,6 +32,23 @@
         <button class="btn btn-primary" @click="contador--">Decrementar</button>
         </div>
       </div>
+      <div class="seccion">
+        <h4 class="text-primary">
+           Lista de Tareas con Conteo y Estado (Propiedades Computadas, Interpolación, Eventos)
+        </h4>
+        <div class="d-grid gap-3 d-md-flex justify-content-md-center mt-5 nueva-tarea" >
+        <input v-model="nuevaTarea" placeholder="Nueva tarea" class="form-control w-50"/>
+        <button class="btn btn-primary" @click="agregarTarea"
+                >Agregar Tarea</button>
+        </div>
+        <ul class="list-group mt-4">
+          <li v-for="tarea in tareas" :key="tarea.id" class="list-group-item d-flex justify-content-between align-items-center">
+            <span :style="{ textDecoration: tarea.completada ? 'line-through' : 'none' }">{{ tarea.texto }}</span>
+            <input type="checkbox" v-model="tarea.completada" />
+          </li>
+        </ul>  
+        <h5 class="text-primary mt-3">Tareas en total: {{ totalTareas }} </h5>
+       <p class="text-primary mt-3">Tareas pendientes: {{ tareasPendientes }} </p>
     </div>
 
     <script>
@@ -44,6 +60,12 @@
             edad: 30,
             ciudad: "Tupungato",
             contador: 0,
+            nuevaTarea: "",
+            tareas: [
+              {id: 1, texto: "Hacer las compras", completada: false},
+              {id: 2, texto: "Lavar el auto", completada: true },
+              {id: 3, texto: "Estudiar Vue.js", completada: false },
+            ]
           };
         },
         methods: {
@@ -52,8 +74,26 @@
             },
             decrementar() {
                 this.contador--;
+            },
+            agregarTarea() {
+                if (this.nuevaTarea !== "") {
+                    this.tareas.push({
+                        id: this.tareas.length + 1,
+                        texto: this.nuevaTarea,
+                        completada: false
+                    });
+                    this.nuevaTarea = "";
+                }
             }
         },
+        computed: {
+            tareasPendientes() {
+                return this.tareas.filter(tarea => !tarea.completada).length;
+            },
+            totalTareas() {
+                return this.tareas.length;
+            }
+        }
       }).mount("#app");
     </script>
     <style>
@@ -67,6 +107,10 @@
       }
       h4 {
         margin-bottom: 1rem;
+      }
+      ul, .nueva-tarea {
+        width: 30vw;
+    margin: auto;
       }
     </style>
   </body>
