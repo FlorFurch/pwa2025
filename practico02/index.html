@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
   <meta charset="UTF-8" />
@@ -8,7 +8,7 @@
   <script src="https://cdn.jsdelivr.net/npm/axios@1.6.7/dist/axios.min.js"></script>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous" />
-  <title>Trabajo Práctico 1</title>
+  <title>Trabajo Práctico 2</title>
 </head>
 
 <body>
@@ -105,6 +105,44 @@
         </div>
       </div>
     </div>
+
+    <div class="seccion">
+        <h4 class="text-primary">Uso de las funciones</h4>
+        <div class="row mt-4 text-start">
+            <!-- Izquierda -->
+            <div class="col-md-6">
+                <h5 class="text-secondary">Listado de Posts</h5>
+                <div class="list-group" style="max-height: 415px; overflow-y: auto;">
+                    <button 
+                        v-for="post in lista10Posts" 
+                        :key="post.id"
+                        @click="verComentariosDeLista(post.id)"
+                        class="list-group-item list-group-item-action"
+                        :class="{ 'active': postSeleccionadoId === post.id }"
+                    >
+                        <strong>#{{ post.id }}</strong> {{ post.title }}
+                    </button>
+                </div>
+            </div>
+            <!-- Derecha -->
+            <div class="col-md-6">
+                <h5 class="text-secondary">Comentarios del Post seleccionado</h5>
+                <div v-if="comentariosSeleccionados.length > 0" class="card">
+                    <div class="card-body" style="max-height: 410px; overflow-y: auto;">
+                        <ul class="list-group list-group-flush">
+                            <li v-for="comentario in comentariosSeleccionados" :key="comentario.id" class="list-group-item">
+                                <strong><small class="text-info text-lowercase">{{ comentario.email }}</small></strong><br>
+                                <span class="text-muted small">{{ comentario.body }}</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div v-else class="alert alert-info">
+                    Seleccione un post de la izquierda para ver sus comentarios.
+                </div>
+            </div>
+        </div>
+      </div>
   </div>
   <script>
     const { createApp } = Vue;
@@ -128,6 +166,9 @@
           posts: [],
           postBuscado: null,
           comentarios: [],
+          lista10Posts: [],          
+          comentariosSeleccionados: [], 
+          postSeleccionadoId: null
         };
       },
       methods: {
@@ -212,6 +253,13 @@
             })
             .finally(function () { });
         },
+        verComentariosDeLista(id) {
+            this.postSeleccionadoId = id; // Para marcarlo en azul
+            this.comentariosSeleccionados = []; // Limpiar anteriores
+            this.obtenerComment(id).then(data => {
+                this.comentariosSeleccionados = data;
+            });
+          }
       },
       computed: {
         tareasPendientes() {
@@ -234,6 +282,15 @@
       },
       mounted() {
         this.agregarEventoCiclo("mounted");
+        // Acá se ejecuta el bucle que carga los 10 posts
+        for (let i = 1; i <= 10; i++) {
+                this.obtenerPost(i).then(post => {
+                    if (post) {
+                        this.lista10Posts.push(post);
+                        this.lista10Posts.sort((a, b) => a.id - b.id);
+                    }
+                });
+            }
       },
       beforeUpdate() {
         this.agregarEventoCiclo("beforeUpdate");
@@ -254,29 +311,24 @@
       margin: 2rem;
       text-align: center;
     }
-
     .seccion {
       border-bottom: 1px solid #999;
       padding: 2rem;
     }
-
     h4 {
       margin-bottom: 1rem;
     }
-
     ul,
     .nueva-tarea {
       width: 30vw;
       margin: auto;
     }
-
     .divScroll {
       height: 200px;
       overflow-y: scroll;
       width: 45%;
       margin: auto;
     }
-
     .comentarios {
       display: flex;
       border: 1px solid #ddd;
