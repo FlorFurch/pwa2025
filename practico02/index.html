@@ -5,6 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios@1.6.7/dist/axios.min.js"></script>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous" />
   <title>Trabajo Práctico 1</title>
@@ -18,7 +19,8 @@
         Información de Perfil Simple (Interpolación)
       </h4>
       <p class="text-body">
-        Hola, mi nombre es {{ nombre }}, tengo {{ edad }} años y vivo en {{ ciudad }}.
+        Hola, mi nombre es {{ nombre }}, tengo {{ edad }} años y vivo en {{
+        ciudad }}.
       </p>
     </div>
     <div class="seccion">
@@ -26,18 +28,25 @@
         Contador Interactivo (Interpolación y Eventos)
       </h4>
       <div class="d-grid gap-5 d-md-flex justify-content-md-center mt-5">
-        <button class="btn btn-primary" @click="contador++">Incrementar</button>
+        <button class="btn btn-primary" @click="contador++">
+          Incrementar
+        </button>
         <h1 class="text-primary">{{ contador }}</h1>
-        <button class="btn btn-primary" @click="contador--">Decrementar</button>
+        <button class="btn btn-primary" @click="contador--">
+          Decrementar
+        </button>
       </div>
     </div>
     <div class="seccion">
       <h4 class="text-primary">
-        Lista de Tareas con Conteo y Estado (Propiedades Computadas, Interpolación, Eventos)
+        Lista de Tareas con Conteo y Estado (Propiedades Computadas,
+        Interpolación, Eventos)
       </h4>
       <div class="d-grid gap-3 d-md-flex justify-content-md-center mt-5 nueva-tarea">
         <input v-model="nuevaTarea" placeholder="Nueva tarea" class="form-control w-50" />
-        <button class="btn btn-primary" @click="agregarTarea">Agregar Tarea</button>
+        <button class="btn btn-primary" @click="agregarTarea">
+          Agregar Tarea
+        </button>
       </div>
       <ul class="list-group mt-4">
         <li v-for="tarea in tareas" :key="tarea.id"
@@ -46,124 +55,234 @@
           <input type="checkbox" v-model="tarea.completada" />
         </li>
       </ul>
-      <h5 class="text-primary mt-3">Tareas en total: {{ totalTareas }} </h5>
-      <p class="text-primary mt-3">Tareas pendientes: {{ tareasPendientes }} </p>
+      <h5 class="text-primary mt-3">Tareas en total: {{ totalTareas }}</h5>
+      <p class="text-primary mt-3">
+        Tareas pendientes: {{ tareasPendientes }}
+      </p>
     </div>
+    <!-- -->
     <!--Acá comienza el TP2-->
+    <!-- -->
     <div class="seccion">
-      <h4 class="text-primary">
-        Lista de eventos
-      </h4>
-      <ul class="list-group mt-4">
-        <li v-for="evento in listaEventos" :key="evento.id"
-          class="list-group-item d-flex justify-content-between align-items-center">
-          <span>{{ evento.id }} - {{ evento.nombre }} - {{ evento.timestamp }}</span>
-        </li>
-      </ul>
+      <h4 class="text-primary">Lista de eventos</h4>
+      <div class="divScroll">
+        <ul class="list-group mt-4">
+          <li v-for="evento in listaEventos" :key="evento.id"
+            class="list-group-item d-flex justify-content-between align-items-center">
+            <span>{{ evento.id }} - {{ evento.nombre }} - {{ evento.timestamp}}</span>
+          </li>
+        </ul>
+      </div>
     </div>
-
-    <script>
-      const { createApp } = Vue;
-      createApp({
-        data() {
-          return {
-            nombre: "Ana García",
-            edad: 30,
-            ciudad: "Tupungato",
-            contador: 0,
-            nuevaTarea: "",
-            tareas: [
-              { id: 1, texto: "Hacer las compras", completada: false },
-              { id: 2, texto: "Lavar el auto", completada: true },
-              { id: 3, texto: "Estudiar Vue.js", completada: false },
-            ],
-            nuevoEvento: "",
-            listaEventos: [],
-            nombreEvento: ""
-          };
+    <div class="seccion">
+      <h4 class="text-primary">Implementación de Axios</h4>
+      <div class="d-grid gap-3 d-md-flex justify-content-md-center mb-5 nueva-tarea">
+        <form @submit.prevent="buscar" class="d-grid gap-3 d-md-flex justify-content-md-center mt-3 nueva-tarea">
+          <input v-model="busqueda" placeholder="Buscar post por ID" class="form-control w-50" />
+          <button class="btn btn-primary">Buscar post</button>
+        </form>
+      </div>
+      <div v-if="postBuscado" class="card text-start shadow-sm nueva-tarea">
+        <div class="card-header bg-primary text-white">
+          Post #{{ postBuscado.id }}: {{ postBuscado.title }}
+        </div>
+        <div class="card-body">
+          <h6 class="card-subtitle mb-2 text-muted nueva-tarea">Detalle:</h6>
+          <p class="card-text">{{ postBuscado.body }}</p>
+          <hr class="mt-4" />
+          <h6 class="text-primary">Comentarios ({{ comentarios.length }})</h6>
+          <div class="comentarios">
+            <ul class="list-group list-group-flush">
+              <li v-for="comentario in comentarios" :key="comentario.id" class="list-group-item bg-light text-start">
+                <strong class="text-info text-lowercase">{{ comentario.email }}</strong>:
+                <p class="mb-0 small">{{ comentario.body }}</p>
+              </li>
+            </ul>
+            <p v-if="comentarios.length === 0" class="text-muted small mt-2">
+              No hay comentarios para este post.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const { createApp } = Vue;
+    createApp({
+      data() {
+        return {
+          nombre: "Ana García",
+          edad: 30,
+          ciudad: "Tupungato",
+          contador: 0,
+          nuevaTarea: "",
+          tareas: [
+            { id: 1, texto: "Hacer las compras", completada: false },
+            { id: 2, texto: "Lavar el auto", completada: true },
+            { id: 3, texto: "Estudiar Vue.js", completada: false },
+          ],
+          nuevoEvento: "",
+          listaEventos: [],
+          nombreEvento: "",
+          busqueda: "",
+          posts: [],
+          postBuscado: null,
+          comentarios: [],
+        };
+      },
+      methods: {
+        incrementar() {
+          this.contador++;
         },
-        methods: {
-          incrementar() {
-            this.contador++;
-          },
-          decrementar() {
-            this.contador--;
-          },
-          agregarTarea() {
-            if (this.nuevaTarea !== "") {
-              this.tareas.push({
-                id: this.tareas.length + 1,
-                texto: this.nuevaTarea,
-                completada: false
-              });
-              this.nuevaTarea = "";
-            }
-          }, 
-          agregarEventoCiclo(nombre) { // tp2
-            this.listaEventos.push({
-              id: this.listaEventos.length + 1,
-              nombre: nombre,
-              timestamp: Date.now()
+        decrementar() {
+          this.contador--;
+        },
+        agregarTarea() {
+          if (this.nuevaTarea !== "") {
+            this.tareas.push({
+              id: this.tareas.length + 1,
+              texto: this.nuevaTarea,
+              completada: false,
             });
-          },
-        },
-        computed: {
-          tareasPendientes() {
-            return this.tareas.filter(tarea => !tarea.completada).length;
-          },
-          totalTareas() {
-            return this.tareas.length;
+            this.nuevaTarea = "";
           }
         },
-        //Ciclo de vida TP2
-        beforeCreate() {
-          // agregarEventoCiclo("beforeCreate") se hace en 'created()' porque no existe todavía.
+        //
+        // TP2
+        //
+        agregarEventoCiclo(nombre) {
+          this.listaEventos.push({
+            id: this.listaEventos.length + 1,
+            nombre: nombre,
+            timestamp: Date.now(),
+          });
         },
-        created() {
-          this.agregarEventoCiclo("beforeCreate");
-          this.agregarEventoCiclo("created");
+        obtenerPost(postId) {
+          return axios.get(`https://jsonplaceholder.typicode.com/posts/${postId}`)
+            .then(function (response) {
+              return response.data;
+            })
+            .catch(function (error) {
+              console.error("Error al obtener post:", error);
+              return null;
+            })
+            .finally(function () { });
         },
-        beforeMount() {
-          this.agregarEventoCiclo("beforeMount")
+        buscar() {
+          const id = parseInt(this.busqueda);
+          this.busqueda = "";
+          this.posts = [];
+          this.postBuscado = null;
+          this.comentarios = [];
+          if (isNaN(id) || id <= 0) {
+            alert("Ingrese un ID de post válido.");
+            return;
+          }
+          this.obtenerPost(id)
+            .then((post) => {
+              if (post) {
+                this.postBuscado = post;
+                this.posts.push(post);
+                return this.obtenerComment(id);
+              } else {
+                this.postBuscado = {
+                  id: id,
+                  title: "No encontrado",
+                  body: "El post no pudo ser cargado.",
+                };
+              }
+            })
+            .then((comentarios) => {
+              this.comentarios = comentarios;
+            })
+            .catch(function (error) {
+            console.log(error);
+            })
+            .finally(function () { 
+            });
         },
-        mounted() {
-          this.agregarEventoCiclo("mounted")
+        obtenerComment(postId) {
+          return axios.get(`https://jsonplaceholder.typicode.com/posts/${postId}/comments`)
+            .then(function (response) {
+              return response.data;
+            })
+            .catch(function (error) {
+              console.log(error);
+              return [];
+            })
+            .finally(function () { });
         },
-        beforeUpdate() {
-          this.agregarEventoCiclo("beforeUpdate")
+      },
+      computed: {
+        tareasPendientes() {
+          return this.tareas.filter((tarea) => !tarea.completada).length;
         },
-        updated() {
-          this.agregarEventoCiclo("updated")
+        totalTareas() {
+          return this.tareas.length;
         },
-        beforeUnmount() {
-          this.agregarEventoCiclo("beforeUnmount")
-        },
-        unmounted() {
-          this.agregarEventoCiclo("unmounted")
-        }
-      }).mount("#app");
-    </script>
-    <style>
-      .app {
-        margin: 2rem;
-        text-align: center;
-      }
+      },
+      //Ciclo de vida TP2
+      beforeCreate() {
+        // agregarEventoCiclo("beforeCreate") se hace en 'created()' porque no existe todavía.
+      },
+      created() {
+        this.agregarEventoCiclo("beforeCreate");
+        this.agregarEventoCiclo("created");
+      },
+      beforeMount() {
+        this.agregarEventoCiclo("beforeMount");
+      },
+      mounted() {
+        this.agregarEventoCiclo("mounted");
+      },
+      beforeUpdate() {
+        this.agregarEventoCiclo("beforeUpdate");
+      },
+      updated() {
+        this.agregarEventoCiclo("updated");
+      },
+      beforeUnmount() {
+        this.agregarEventoCiclo("beforeUnmount");
+      },
+      unmounted() {
+        this.agregarEventoCiclo("unmounted");
+      },
+    }).mount("#app");
+  </script>
+  <style>
+    .app {
+      margin: 2rem;
+      text-align: center;
+    }
 
-      .seccion {
-        border-bottom: 1px solid #999;
-        padding: 2rem;
-      }
+    .seccion {
+      border-bottom: 1px solid #999;
+      padding: 2rem;
+    }
 
-      h4 {
-        margin-bottom: 1rem;
-      }
+    h4 {
+      margin-bottom: 1rem;
+    }
 
-      ul,
-      .nueva-tarea {
-        width: 30vw;
-        margin: auto;
-      }
-    </style>
+    ul,
+    .nueva-tarea {
+      width: 30vw;
+      margin: auto;
+    }
+
+    .divScroll {
+      height: 200px;
+      overflow-y: scroll;
+      width: 45%;
+      margin: auto;
+    }
+
+    .comentarios {
+      display: flex;
+      border: 1px solid #ddd;
+      padding: 10px;
+    }
+  </style>
 </body>
 
 </html>
