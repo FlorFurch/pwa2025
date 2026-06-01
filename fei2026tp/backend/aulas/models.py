@@ -31,4 +31,22 @@ class Aula(models.Model):
     es_climatizada = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"{self.descripcion} - {self.ubicacion}"
+        return f"{self.descripcion} - {self.ubicacion} - Proyectores: {self.cant_proyector} - Aforo: {self.aforo} - Climatizada: {'Sí' if self.es_climatizada else 'No'}"
+    
+class ReservaAula(models.Model):
+    id_aula = models.ForeignKey(Aula, on_delete=models.CASCADE)
+    fh_desde = models.DateTimeField()
+    fh_hasta = models.DateTimeField()
+    observacion = models.CharField(max_length=256)
+
+    def __str__(self):
+        return f"{self.id_aula.descripcion} - {self.fh_desde} to {self.fh_hasta}"
+    
+class HorarioMateria(models.Model):
+    id_materia = models.ForeignKey(Materia, on_delete=models.CASCADE)
+    id_reserva = models.ForeignKey(ReservaAula, on_delete=models.CASCADE)
+    fh_desde = models.DateTimeField()
+    fh_hasta = models.DateTimeField()
+    
+    def __str__(self):
+        return f"{self.id_materia.nombre} - {self.fh_desde} to {self.fh_hasta}"
